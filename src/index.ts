@@ -147,12 +147,20 @@ async function getSubtleImpl() {
     return window.crypto.subtle;
   }
 
+  if (typeof globalThis !== "undefined" && globalThis.crypto) {
+    return globalThis.crypto.subtle;
+  }
+
   const crypto = await import("crypto");
   return crypto.subtle;
 }
 async function getRandomValuesImpl() {
   if (typeof window !== "undefined") {
     return window.crypto.getRandomValues;
+  }
+
+  if (typeof globalThis !== "undefined" && globalThis.crypto) {
+    return globalThis.crypto.getRandomValues;
   }
 
   const crypto = await import("crypto");
