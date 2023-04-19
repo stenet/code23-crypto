@@ -11,7 +11,7 @@ export const CryptoFallback = {
 
 export const CryptoAes = {
   async getKey(password: string) {
-    const subtle = getSubtleImpl();
+    const subtle = await getSubtleImpl();
     
     const passwordHash = await CryptoSha.sha256(password);
 
@@ -24,8 +24,9 @@ export const CryptoAes = {
   },
 
   async encrypt(key: CryptoKey, message: string) {
-    const subtle = getSubtleImpl();
-    const getRandomValues: Function = getRandomValuesImpl();
+    const subtle = await getSubtleImpl();
+    const getRandomValues: Function = await getRandomValuesImpl();
+    const Buffer = await getBufferImpl();
 
     const encodedMessage = new TextEncoder().encode(message);
 
@@ -42,7 +43,8 @@ export const CryptoAes = {
       + Buffer.from(encryptedMessage).toString("base64");
   },
   async decrypt(key: CryptoKey, encrypted: string) {
-    const subtle = getSubtleImpl();
+    const subtle = await getSubtleImpl();
+    const Buffer = await getBufferImpl();
 
     const iv = Buffer.from(encrypted.slice(0, 24), "hex");
     const encodedMessage = Buffer.from(encrypted.slice(24), "base64");
@@ -61,7 +63,8 @@ export const CryptoAes = {
 
 export const CryptoRsa = {
   async generateKeys() {
-    const subtle = getSubtleImpl();
+    const subtle = await getSubtleImpl();
+    const Buffer = await getBufferImpl();
 
     const key = await subtle.generateKey(
       rsaAlgorithm,
@@ -86,7 +89,8 @@ export const CryptoRsa = {
   },
 
   async getPublicKeyFromBase64(publicKeyBase64: string) {
-    const subtle = getSubtleImpl();
+    const subtle = await getSubtleImpl();
+    const Buffer = await getBufferImpl();
 
     return await subtle.importKey(
       "spki",
@@ -96,7 +100,8 @@ export const CryptoRsa = {
       ["encrypt"])
   },
   async getPrivateKeyFromBase64(privateKeyBase64: string) {
-    const subtle = getSubtleImpl();
+    const subtle = await getSubtleImpl();
+    const Buffer = await getBufferImpl();
 
     return await subtle.importKey(
       "pkcs8",
@@ -107,7 +112,8 @@ export const CryptoRsa = {
   },
   
   async encrypt(publicKey: CryptoKey, message: string) {
-    const subtle = getSubtleImpl();
+    const subtle = await getSubtleImpl();
+    const Buffer = await getBufferImpl();
 
     const encrypted = await subtle.encrypt(
       rsaAlgorithm,
@@ -117,7 +123,8 @@ export const CryptoRsa = {
     return Buffer.from(encrypted).toString("base64");
   },
   async decrypt(privateKey: CryptoKey, encrypted: string) {
-    const subtle = getSubtleImpl();
+    const subtle = await getSubtleImpl();
+    const Buffer = await getBufferImpl();
 
     const decrypted = await subtle.decrypt(
       rsaAlgorithm,
@@ -137,28 +144,28 @@ export const CryptoSha = {
       new TextEncoder().encode(text));
   },
   async sha256ToBase64(text: string) {
+    const Buffer = await getBufferImpl();
+
     const r = await CryptoSha.sha256(text);
     return Buffer.from(r).toString("base64");
   },
   async sha256ToHex(text: string) {
+    const Buffer = await getBufferImpl();
+    
     const r = await CryptoSha.sha256(text);
     return Buffer.from(r).toString("hex");
   }
 }
 
-function getSubtleImpl() {
-  const crypto = getCrypto();
+async function getSubtleImpl() {
+  const crypto = await getCryptoImpl();
   return crypto.subtle;
 }
-function getRandomValuesImpl() {
-  const crypto = getCrypto();
+async function getRandomValuesImpl() {
+  const crypto = await getCryptoImpl();
   return crypto.getRandomValues;
 }
-function getCrypto() {
-  if (CryptoFallback.crypto) {
-    return CryptoFallback.crypto;
-  }
-
+async function getCryptoImpl() {
   if (typeof crypto !== "undefined") {
     return crypto;
   }
@@ -171,5 +178,21 @@ function getCrypto() {
     return globalThis.crypto;
   }
 
-  throw new Error("No crypto implementation found");
+  return await import("crypto");
+}
+async function getBufferImpl() {
+  if (typeof Buffer !== "undefined") {
+    return Buffer;
+  }
+
+  if (typeof window !== "undefined") {
+    return window.Buffer;
+  }
+
+  if (typeof globalThis !== "undefined" && globalThis.Buffer) {
+    return globalThis.Buffer;
+  }
+
+  const r = await import("node:buffer");
+  return r.Buffer;
 }

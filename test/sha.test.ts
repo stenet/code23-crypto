@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { CryptoFallback, CryptoSha } from "../src/index";
-import crypto from "crypto";
-
-CryptoFallback.crypto = crypto as any;
+import { CryptoSha } from "../src/index";
 
 describe("SHA256", () => {
   it("ArrayBuffer", async () => {
