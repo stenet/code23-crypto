@@ -151,7 +151,7 @@ export const CryptoSha = {
   },
   async sha256ToHex(text: string) {
     const Buffer = await getBufferImpl();
-    
+
     const r = await CryptoSha.sha256(text);
     return Buffer.from(r).toString("hex");
   }
@@ -178,7 +178,7 @@ async function getCryptoImpl() {
     return globalThis.crypto;
   }
 
-  return await import("crypto");
+  return await import("node:crypto");
 }
 async function getBufferImpl() {
   if (typeof Buffer !== "undefined") {
