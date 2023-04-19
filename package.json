@@ -1,6 +1,6 @@
 {
   "name": "code23-crypto",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Simple WebCrypto for Browser and Node",
   "type": "module",
   "exports": {
@@ -19,8 +19,8 @@
     "test": "vitest run",
     "test:ui": "vitest --ui",
     "preversion": "npm test",
-    "version": "npm run build && git add -A dist",
-    "postversion": "git push && git push --tags && rm -rf build/temp"
+    "version": "npm run build",
+    "postversion": "git push && git push --tags"
   },
   "keywords": [],
   "author": "Stefan Heim",
