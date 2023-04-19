@@ -5,9 +5,13 @@ const rsaAlgorithm: RsaHashedKeyAlgorithm = {
   hash: {name: "SHA-256"}
 }
 
+export const CryptoFallback = {
+  crypto: undefined satisfies Crypto | undefined
+}
+
 export const CryptoAes = {
   async getKey(password: string) {
-    const subtle = await getSubtleImpl();
+    const subtle = getSubtleImpl();
     
     const passwordHash = await CryptoSha.sha256(password);
 
@@ -20,8 +24,8 @@ export const CryptoAes = {
   },
 
   async encrypt(key: CryptoKey, message: string) {
-    const subtle = await getSubtleImpl();
-    const getRandomValues: Function = await getRandomValuesImpl();
+    const subtle = getSubtleImpl();
+    const getRandomValues: Function = getRandomValuesImpl();
 
     const encodedMessage = new TextEncoder().encode(message);
 
@@ -38,7 +42,7 @@ export const CryptoAes = {
       + Buffer.from(encryptedMessage).toString("base64");
   },
   async decrypt(key: CryptoKey, encrypted: string) {
-    const subtle = await getSubtleImpl();
+    const subtle = getSubtleImpl();
 
     const iv = Buffer.from(encrypted.slice(0, 24), "hex");
     const encodedMessage = Buffer.from(encrypted.slice(24), "base64");
@@ -57,7 +61,7 @@ export const CryptoAes = {
 
 export const CryptoRsa = {
   async generateKeys() {
-    const subtle = await getSubtleImpl();
+    const subtle = getSubtleImpl();
 
     const key = await subtle.generateKey(
       rsaAlgorithm,
@@ -82,7 +86,7 @@ export const CryptoRsa = {
   },
 
   async getPublicKeyFromBase64(publicKeyBase64: string) {
-    const subtle = await getSubtleImpl();
+    const subtle = getSubtleImpl();
 
     return await subtle.importKey(
       "spki",
@@ -92,7 +96,7 @@ export const CryptoRsa = {
       ["encrypt"])
   },
   async getPrivateKeyFromBase64(privateKeyBase64: string) {
-    const subtle = await getSubtleImpl();
+    const subtle = getSubtleImpl();
 
     return await subtle.importKey(
       "pkcs8",
@@ -103,7 +107,7 @@ export const CryptoRsa = {
   },
   
   async encrypt(publicKey: CryptoKey, message: string) {
-    const subtle = await getSubtleImpl();
+    const subtle = getSubtleImpl();
 
     const encrypted = await subtle.encrypt(
       rsaAlgorithm,
@@ -113,7 +117,7 @@ export const CryptoRsa = {
     return Buffer.from(encrypted).toString("base64");
   },
   async decrypt(privateKey: CryptoKey, encrypted: string) {
-    const subtle = await getSubtleImpl();
+    const subtle = getSubtleImpl();
 
     const decrypted = await subtle.decrypt(
       rsaAlgorithm,
@@ -142,15 +146,19 @@ export const CryptoSha = {
   }
 }
 
-async function getSubtleImpl() {
-  const crypto = await getCrypto();
+function getSubtleImpl() {
+  const crypto = getCrypto();
   return crypto.subtle;
 }
-async function getRandomValuesImpl() {
-  const crypto = await getCrypto();
+function getRandomValuesImpl() {
+  const crypto = getCrypto();
   return crypto.getRandomValues;
 }
-async function getCrypto() {
+function getCrypto() {
+  if (CryptoFallback.crypto) {
+    return CryptoFallback.crypto;
+  }
+
   if (typeof crypto !== "undefined") {
     return crypto;
   }

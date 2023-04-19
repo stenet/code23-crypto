@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { CryptoRsa } from "../src/index";
+import { CryptoFallback, CryptoRsa } from "../src/index";
+import crypto from "crypto";
+
+CryptoFallback.crypto = crypto as any;
 
 describe("RSA", () => {
   it("Encode/Decode", async () => {
