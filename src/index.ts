@@ -84,7 +84,7 @@ export const CryptoRsa = {
   async getPublicKeyFromBase64(publicKeyBase64: string) {
     const subtle = await getSubtleImpl();
 
-    await subtle.importKey(
+    return await subtle.importKey(
       "spki",
       Buffer.from(publicKeyBase64, "base64"),
       rsaAlgorithm,
