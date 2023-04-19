@@ -17,14 +17,15 @@
   "scripts": {
     "build": "unbuild",
     "test": "vitest run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "preversion": "npm test",
+    "version": "npm run build && git add -A dist",
+    "postversion": "git push && git push --tags && rm -rf build/temp"
   },
   "keywords": [],
   "author": "Stefan Heim",
   "license": "ISC",
   "devDependencies": {
-    "@lerna-lite/cli": "^2.0.0",
-    "@lerna-lite/publish": "^2.0.0",
     "@types/node": "^18.15.11",
     "@vitest/ui": "^0.30.1",
     "unbuild": "^1.2.1",
