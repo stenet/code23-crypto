@@ -24,6 +24,7 @@
   "license": "ISC",
   "devDependencies": {
     "@lerna-lite/cli": "^2.0.0",
+    "@lerna-lite/publish": "^2.0.0",
     "@types/node": "^18.15.11",
     "@vitest/ui": "^0.30.1",
     "unbuild": "^1.2.1",
