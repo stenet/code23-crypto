@@ -17,10 +17,7 @@
   "scripts": {
     "build": "unbuild",
     "test": "vitest run",
-    "test:ui": "vitest --ui",
-    "preversion": "npm test",
-    "version": "npm run build",
-    "postversion": "git push && git push --tags"
+    "test:ui": "vitest --ui"
   },
   "keywords": [],
   "author": "Stefan Heim",
@@ -28,6 +25,9 @@
   "devDependencies": {
     "@types/node": "^18.15.11",
     "@vitest/ui": "^0.30.1",
+    "install": "^0.13.0",
+    "npm": "^9.6.4",
+    "release-it": "^15.10.1",
     "unbuild": "^1.2.1",
     "vitest": "^0.30.1"
   }
