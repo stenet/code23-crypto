@@ -7,12 +7,5 @@
   },
   "npm": {
     "publish": false
-  },
-  "plugins": {
-    "@release-it/keep-a-changelog": {
-      "filename": "CHANGELOG.md",
-      "addVersionUrl": true,
-      "strictLatest": false
-    }
   }
 }
