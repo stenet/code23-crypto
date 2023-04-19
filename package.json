@@ -17,7 +17,8 @@
   "scripts": {
     "build": "unbuild",
     "test": "vitest run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "release": "release-it"
   },
   "keywords": [],
   "author": "Stefan Heim",
