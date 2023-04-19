@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "build": "unbuild",
-    "test": "vitest",
+    "test": "vitest run",
     "test:ui": "vitest --ui"
   },
   "keywords": [],
