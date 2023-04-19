@@ -1,0 +1,24 @@
+{
+  "name": "code23-crypto",
+  "version": "0.0.1",
+  "description": "Simple WebCrypto for Browser and Node",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "unbuild"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "unbuild": "^1.2.1"
+  }
+}
