@@ -163,6 +163,5 @@ async function getCrypto() {
     return globalThis.crypto;
   }
 
-  const cryptoImport = await import("crypto");
-  return cryptoImport;
+  throw new Error("No crypto implementation found");
 }
