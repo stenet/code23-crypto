@@ -143,26 +143,26 @@ export const CryptoSha = {
 }
 
 async function getSubtleImpl() {
-  if (typeof window !== "undefined") {
-    return window.crypto.subtle;
-  }
-
-  if (typeof globalThis !== "undefined" && globalThis.crypto) {
-    return globalThis.crypto.subtle;
-  }
-
-  const crypto = await import("crypto");
+  const crypto = await getCrypto();
   return crypto.subtle;
 }
 async function getRandomValuesImpl() {
+  const crypto = await getCrypto();
+  return crypto.getRandomValues;
+}
+async function getCrypto() {
+  if (typeof crypto !== "undefined") {
+    return crypto;
+  }
+
   if (typeof window !== "undefined") {
-    return window.crypto.getRandomValues;
+    return window.crypto;
   }
 
   if (typeof globalThis !== "undefined" && globalThis.crypto) {
-    return globalThis.crypto.getRandomValues;
+    return globalThis.crypto;
   }
 
-  const crypto = await import("crypto");
-  return crypto.getRandomValues;
+  const cryptoImport = await import("crypto");
+  return cryptoImport;
 }
