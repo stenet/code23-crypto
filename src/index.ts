@@ -151,7 +151,7 @@ async function getSubtleImpl() {
 }
 async function getRandomValuesImpl() {
   const crypto = await getCryptoImpl();
-  return crypto.getRandomValues;
+  return crypto.getRandomValues.bind(crypto);
 }
 async function getCryptoImpl() {
   if (typeof crypto !== "undefined") {
