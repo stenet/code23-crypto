@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "build": "unbuild",
-    "prepublish": "npm run build",
+    "prepublishOnly": "npm run build",
     "test": "vitest run",
     "test:ui": "vitest --ui",
     "release": "release-it"
