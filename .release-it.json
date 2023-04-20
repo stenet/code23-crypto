@@ -9,6 +9,6 @@
     "publish": false
   },
   "hooks": {
-    "before:bump": "npm run test && npm run build"
+    "before:init": "npm run test && npm run build"
   }
 }
