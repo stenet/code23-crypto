@@ -90,8 +90,11 @@ export const CryptoRsa = {
     return await subtle.importKey(
       "spki",
       convertBase64ToArrayBuffer(publicKeyBase64),
-      rsaAlgorithm,
-      true,
+      {
+        name: rsaAlgorithm.name,
+        hash: rsaAlgorithm.hash
+      },
+      false,
       ["encrypt"])
   },
   async getPrivateKeyFromBase64(privateKeyBase64: string) {
@@ -100,8 +103,11 @@ export const CryptoRsa = {
     return await subtle.importKey(
       "pkcs8",
       convertBase64ToArrayBuffer(privateKeyBase64),
-      rsaAlgorithm,
-      true,
+      {
+        name: rsaAlgorithm.name,
+        hash: rsaAlgorithm.hash
+      },
+      false,
       ["decrypt"])
   },
   

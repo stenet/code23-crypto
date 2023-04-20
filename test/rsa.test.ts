@@ -9,6 +9,9 @@ describe("RSA", () => {
     const enc = await CryptoRsa.encrypt(keys.publicKey, text);
     const dec = await CryptoRsa.decrypt(keys.privateKey, enc);
 
+    console.log("privateKey", keys.privateKeyBase64);
+    console.log("publicKey", keys.publicKeyBase64);
+
     expect(dec).toBe(text);
   });
 
