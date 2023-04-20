@@ -26,7 +26,6 @@ export const CryptoAes = {
   async encrypt(key: CryptoKey, message: string) {
     const subtle = await getSubtleImpl();
     const getRandomValues: Function = await getRandomValuesImpl();
-    const Buffer = await getBufferImpl();
 
     const encodedMessage = new TextEncoder().encode(message);
 
@@ -39,12 +38,10 @@ export const CryptoAes = {
       key, 
       encodedMessage);
 
-    return Buffer.from(iv).toString("hex")
-      + Buffer.from(encryptedMessage).toString("base64");
+    return convertArrayBufferToHex(iv) + convertArrayBufferToBase64(encryptedMessage);
   },
   async decrypt(key: CryptoKey, encrypted: string) {
     const subtle = await getSubtleImpl();
-    const Buffer = await getBufferImpl();
 
     const iv = Buffer.from(encrypted.slice(0, 24), "hex");
     const encodedMessage = Buffer.from(encrypted.slice(24), "base64");
@@ -57,14 +54,13 @@ export const CryptoAes = {
       key,
       encodedMessage);
     
-    return Buffer.from(decryptedMessage).toString();
+    return new TextDecoder().decode(decryptedMessage);
   }
 }
 
 export const CryptoRsa = {
   async generateKeys() {
     const subtle = await getSubtleImpl();
-    const Buffer = await getBufferImpl();
 
     const key = await subtle.generateKey(
       rsaAlgorithm,
@@ -82,30 +78,28 @@ export const CryptoRsa = {
 
     return {
       privateKey: key.privateKey,
-      privateKeyBase64: Buffer.from(privateKey).toString("base64"),
+      privateKeyBase64: convertArrayBufferToBase64(privateKey),
       publicKey: key.publicKey,
-      publicKeyBase64: Buffer.from(publicKey).toString("base64")
+      publicKeyBase64: convertArrayBufferToBase64(publicKey)
     }
   },
 
   async getPublicKeyFromBase64(publicKeyBase64: string) {
     const subtle = await getSubtleImpl();
-    const Buffer = await getBufferImpl();
 
     return await subtle.importKey(
       "spki",
-      Buffer.from(publicKeyBase64, "base64"),
+      convertBase64ToArrayBuffer(publicKeyBase64),
       rsaAlgorithm,
       true,
       ["encrypt"])
   },
   async getPrivateKeyFromBase64(privateKeyBase64: string) {
     const subtle = await getSubtleImpl();
-    const Buffer = await getBufferImpl();
 
     return await subtle.importKey(
       "pkcs8",
-      Buffer.from(privateKeyBase64, "base64"),
+      convertBase64ToArrayBuffer(privateKeyBase64),
       rsaAlgorithm,
       true,
       ["decrypt"])
@@ -113,25 +107,23 @@ export const CryptoRsa = {
   
   async encrypt(publicKey: CryptoKey, message: string) {
     const subtle = await getSubtleImpl();
-    const Buffer = await getBufferImpl();
 
     const encrypted = await subtle.encrypt(
       rsaAlgorithm,
       publicKey,
-      Buffer.from(message));
+      new TextEncoder().encode(message));
 
-    return Buffer.from(encrypted).toString("base64");
+    return convertArrayBufferToBase64(encrypted);
   },
   async decrypt(privateKey: CryptoKey, encrypted: string) {
     const subtle = await getSubtleImpl();
-    const Buffer = await getBufferImpl();
 
     const decrypted = await subtle.decrypt(
       rsaAlgorithm,
       privateKey,
-      Buffer.from(encrypted, "base64"));
+      convertBase64ToArrayBuffer(encrypted));
 
-      return Buffer.from(decrypted).toString()
+      return new TextDecoder().decode(decrypted);
   }
 }
 
@@ -144,16 +136,12 @@ export const CryptoSha = {
       new TextEncoder().encode(text));
   },
   async sha256ToBase64(text: string) {
-    const Buffer = await getBufferImpl();
-
     const r = await CryptoSha.sha256(text);
-    return Buffer.from(r).toString("base64");
+    return convertArrayBufferToBase64(r);
   },
   async sha256ToHex(text: string) {
-    const Buffer = await getBufferImpl();
-
     const r = await CryptoSha.sha256(text);
-    return Buffer.from(r).toString("hex");
+    return convertArrayBufferToHex(r);
   }
 }
 
@@ -180,19 +168,15 @@ async function getCryptoImpl() {
 
   return await import("node:crypto");
 }
-async function getBufferImpl() {
-  if (typeof Buffer !== "undefined") {
-    return Buffer;
-  }
 
-  if (typeof window !== "undefined") {
-    return window.Buffer;
-  }
-
-  if (typeof globalThis !== "undefined" && globalThis.Buffer) {
-    return globalThis.Buffer;
-  }
-
-  const r = await import("node:buffer");
-  return r.Buffer;
+function convertArrayBufferToHex(buffer: ArrayBuffer) {
+  return [...new Uint8Array(buffer)]
+    .map(x => x.toString(16).padStart(2, "0"))
+    .join("");
+}
+function convertArrayBufferToBase64(buffer: ArrayBuffer) {
+  return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+}
+function convertBase64ToArrayBuffer(base64: string) {
+  return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
 }
