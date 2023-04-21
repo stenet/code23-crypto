@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test (see console)</title>
+</head>
+<body>
+  <script type="module">
+    import { CryptoAes, CryptoRsa, CryptoSha } from "./src/index.ts"
+
+    async function sha256() {
+      const shaBase64 = await CryptoSha.sha256Base64("hello");
+      const shaBase64Compare = "LPJNul+wow4m6DsqxbninhsWHlwfp0JecwQzYpOLmCQ=";
+      console.log("base64", shaBase64 === shaBase64Compare);
+
+      const shaHex = await CryptoSha.sha256Hex("hello");
+      const shaHexCompare = "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824";
+      console.log("hex", shaHex === shaHexCompare);
+    }
+    
+    async function aes1() {
+      const key = await CryptoAes.getKey("Hello");
+
+      const text = "Hello World";
+      const enc = await CryptoAes.encrypt(key, text);
+      const dec = await CryptoAes.decrypt(key, enc);
+
+      console.log("aes1", text === dec);
+    }
+
+    async function rsa1() {
+      const keys = await CryptoRsa.generateKeys();
+
+      const text = "Hello World";
+      const enc = await CryptoRsa.encrypt(keys.publicKey, text);
+      const dec = await CryptoRsa.decrypt(keys.privateKey, enc);
+
+      console.log("privateKey", keys.privateKeyBase64);
+      console.log("publicKey", keys.publicKeyBase64);
+
+      console.log("rsa1", text === dec);
+    }
+    
+    async function rsa2() {
+      const keys = await CryptoRsa.generateKeys();
+
+      const text = "Hello World";
+
+      const publicKey = await CryptoRsa.getPublicKeyFromBase64(keys.publicKeyBase64);
+      const enc = await CryptoRsa.encrypt(publicKey, text);
+
+      const privateKey = await CryptoRsa.getPrivateKeyFromBase64(keys.privateKeyBase64);
+      const dec = await CryptoRsa.decrypt(privateKey, enc);
+
+      console.log("rsa2", text === dec);
+    }
+
+    await sha256();
+    await aes1();
+    await rsa1();
+    await rsa2();
+  </script>
+</body>
+</html>

@@ -43,8 +43,8 @@ export const CryptoAes = {
   async decrypt(key: CryptoKey, encrypted: string) {
     const subtle = await getSubtleImpl();
 
-    const iv = Buffer.from(encrypted.slice(0, 24), "hex");
-    const encodedMessage = Buffer.from(encrypted.slice(24), "base64");
+    const iv = convertHexToArrayBuffer(encrypted.slice(0, 24));
+    const encodedMessage = convertBase64ToArrayBuffer(encrypted.slice(24));
     
     const decryptedMessage = await subtle.decrypt(
       {
@@ -141,11 +141,11 @@ export const CryptoSha = {
       "SHA-256", 
       new TextEncoder().encode(text));
   },
-  async sha256ToBase64(text: string) {
+  async sha256Base64(text: string) {
     const r = await CryptoSha.sha256(text);
     return convertArrayBufferToBase64(r);
   },
-  async sha256ToHex(text: string) {
+  async sha256Hex(text: string) {
     const r = await CryptoSha.sha256(text);
     return convertArrayBufferToHex(r);
   }
@@ -182,6 +182,9 @@ function convertArrayBufferToHex(buffer: ArrayBuffer) {
 }
 function convertArrayBufferToBase64(buffer: ArrayBuffer) {
   return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+}
+function convertHexToArrayBuffer(hex: string) {
+  return Uint8Array.from(hex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
 }
 function convertBase64ToArrayBuffer(base64: string) {
   return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
