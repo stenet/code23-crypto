@@ -181,7 +181,15 @@ function convertArrayBufferToHex(buffer: ArrayBuffer) {
     .join("");
 }
 function convertArrayBufferToBase64(buffer: ArrayBuffer) {
-  return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  
+  let binary = "";
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  
+  return btoa(binary);
 }
 function convertHexToArrayBuffer(hex: string) {
   return Uint8Array.from(hex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
